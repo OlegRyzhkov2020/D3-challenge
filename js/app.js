@@ -8,12 +8,12 @@ var margin = {
   top: 20,
   right: 40,
   bottom: 60,
-  left: 330
+  left: 60
 };
 
 var width = svgWidth - margin.left - margin.right;
 var height = svgHeight - margin.top - margin.bottom;
-var left = 260 - margin.left
+var left = 0;
 
 // Create an SVG wrapper, append an SVG group that will hold our chart,
 // and shift the latter by left and top margins.
@@ -26,13 +26,6 @@ var svg = d3
 // Append an SVG group
 var chartGroup = svg.append("g")
   .attr("transform", `translate(${margin.left}, ${margin.top})`);
-
-chartGroup.append("text")
-    .attr("y", 0 - margin.left + 320)
-    .attr("x", 0 + height - 50)
-    .attr("dy", ".71em")
-    .style("text-anchor", "end")
-    .text("Census Data Analysis, USA");
 
 // Initial Params
 var chosenXAxis = "income";
@@ -88,6 +81,7 @@ function renderCircles(circlesGroup, newXScale, newYScale, chosenXAxis, chosenYA
     .duration(1000)
     .attr("cx", d => newXScale(d[chosenXAxis]))
     .attr("cy", d => newYScale(d[chosenYAxis]));
+
   return circlesGroup;
 }
 
@@ -101,12 +95,14 @@ function renderLine (lineGroup, censusData, xLinearScale, yLinearScale, chosenXA
     .x(function(d) { return xLinearScale(d[chosenXAxis]); })
     .y(function(d) { return yLinearScale(newregression(d[chosenXAxis])); });
 
-  console.log(chosenXAxis, chosenYAxis);
-
   lineGroup
     .transition()
     .duration(1000)
     .attr("d", newline);
+
+  // Update table data
+  // buildTable(StatesData, XaxisData, YaxisData, chosenXAxis, chosenYAxis);
+
   return lineGroup;
 
 }
@@ -141,7 +137,6 @@ function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
     .html(function(d) {
       return (`${yLabel} ${d[chosenYAxis]}<br>${xLabel} ${d[chosenXAxis]}`);
     });
-  //console.log(toolTip);
   circlesGroup.call(toolTip);
 
   circlesGroup.on("mouseover", function(data) {
@@ -167,15 +162,21 @@ d3.csv("data/data.csv").then(function(censusData, err) {
     data.income = +data.income;
     data.age = +data.age;
     data.obesity = +data.obesity;
+    data.state = data.state;
   });
+
   // regression data
   var XaxisData = censusData.map(function(d) { return d[chosenXAxis]; });
   var YaxisData = censusData.map(function(d) { return d[chosenYAxis]; });
-  regression=leastSquaresequation(XaxisData,YaxisData)
+  regression = leastSquaresequation(XaxisData,YaxisData)
 
   var line = d3.line()
     .x(function(d) { return xLinearScale(d[chosenXAxis]); })
     .y(function(d) { return yLinearScale(regression(d[chosenXAxis])); });
+
+  // Initial table data
+  var StatesData = censusData.map(function(d) { return d.state; });
+  buildTable(StatesData, XaxisData, YaxisData, chosenXAxis, chosenYAxis);
 
   // xLinearScale function above csv import
   var xLinearScale = xScale(censusData, chosenXAxis);
@@ -196,7 +197,7 @@ d3.csv("data/data.csv").then(function(censusData, err) {
   // append y axis
   var yAxis = chartGroup.append("g")
     .classed("y-axis", true)
-    .attr("transform", `translate(${left+70}, 0)`)
+    .attr("transform", `translate(${left}, 0)`)
     .call(leftAxis);
 
   // append initial circles
@@ -210,12 +211,24 @@ d3.csv("data/data.csv").then(function(censusData, err) {
     .attr("fill", "cadetblue")
     .attr("opacity", ".8");
 
-
+  // append initial fitting line
   var lineGroup = chartGroup.append("path")
-          //.selectAll("path")
-          .datum(censusData)
-          .attr("class", "line")
-          .attr("d", line);
+    .datum(censusData)
+    .attr("class", "line")
+    .attr("d", line);
+
+  // append initial equation
+  let regr_coeff = regr_equation(XaxisData, YaxisData);
+  let slope_value = regr_coeff[0].toFixed(4).toString();
+  let intercept_value = regr_coeff[1].toFixed(4).toString();
+  var formula = 'y =  ' + slope_value + 'x + ' + intercept_value;
+  chartGroup.append("text")
+      .attr("y", 0 - margin.left + 370)
+      .attr("x", 0 + height - 70)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .style("fill", "darkred")
+      .text(formula);
 
   // Create group for three x-axis labels
   var XlabelsGroup = chartGroup.append("g")
@@ -245,7 +258,7 @@ d3.csv("data/data.csv").then(function(censusData, err) {
   // Create group for three y-axis labels
   var YlabelsGroup = chartGroup.append("g")
       .attr("transform",
-            `translate(${left}, ${height/2})`);
+            `translate(${left-50}, ${height/2})`);
 
   var povertyLabel = YlabelsGroup.append("text")
     .attr("transform", "rotate(-90)")
@@ -286,8 +299,6 @@ d3.csv("data/data.csv").then(function(censusData, err) {
 
         // replaces chosenXAxis with value
         chosenXAxis = value;
-
-        // console.log(chosenXAxis)
 
         // functions here found above csv import
         // updates x scale for new data
@@ -351,8 +362,6 @@ d3.csv("data/data.csv").then(function(censusData, err) {
 
           // replaces chosenXAxis with value
           chosenYAxis = value;
-
-          // console.log(chosenXAxis)
 
           // functions here found above csv import
           // updates x scale for new data
