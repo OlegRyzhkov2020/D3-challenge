@@ -1,4 +1,4 @@
-function leastSquaresequation(XaxisData, Yaxisdata) {
+function regr_equation(XaxisData, Yaxisdata) {
     var ReduceAddition = function(prev, cur) { return prev + cur; };
 
     // finding the mean of Xaxis and Yaxis data
@@ -17,9 +17,15 @@ function leastSquaresequation(XaxisData, Yaxisdata) {
     var slope = MeanDiffXY / SquareXX;
     var intercept = yBar - (xBar * slope);
 
-// returning regression function
-    return function(x){
-      return x*slope+intercept
-    }
-
+    return [slope, intercept];
   }
+function leastSquaresequation(XaxisData, Yaxisdata) {
+  var result = regr_equation(XaxisData, Yaxisdata);
+  var slope = result[0];
+  var intercept = result[1];
+
+  return function(x){
+    return x*slope+intercept
+  }
+
+}

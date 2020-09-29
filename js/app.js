@@ -91,19 +91,23 @@ function renderCircles(circlesGroup, newXScale, newYScale, chosenXAxis, chosenYA
   return circlesGroup;
 }
 
-function renderLine (censusData, xLinearScale, yLinearScale, chosenXAxis, chosenYAxis) {
+function renderLine (lineGroup, censusData, xLinearScale, yLinearScale, chosenXAxis, chosenYAxis) {
   // regression data
-  var XaxisData = censusData.map(function(d) { return d[chosenXAxis]; });
-  var YaxisData = censusData.map(function(d) { return d[chosenYAxis]; });
-  regression=leastSquaresequation(XaxisData,YaxisData)
+  var newXaxisData = censusData.map(function(d) { return d[chosenXAxis]; });
+  var newYaxisData = censusData.map(function(d) { return d[chosenYAxis]; });
+  var newregression = leastSquaresequation(newXaxisData,newYaxisData)
 
-  var line = d3.line()
-    .x(function(d) { console.log(d[chosenXAxis], xLinearScale(d[chosenXAxis])); return xLinearScale(d[chosenXAxis]); })
-    .y(function(d) { console.log(d[chosenYAxis], yLinearScale(d[chosenXAxis])); return yLinearScale(regression(d[chosenXAxis])); });
+  var newline = d3.line()
+    .x(function(d) { return xLinearScale(d[chosenXAxis]); })
+    .y(function(d) { return yLinearScale(newregression(d[chosenXAxis])); });
 
-  lineGroup.transition()
+  console.log(chosenXAxis, chosenYAxis);
+
+  lineGroup
+    .transition()
     .duration(1000)
-    .attr("d", line);
+    .attr("d", newline);
+  return lineGroup;
 
 }
 
@@ -137,7 +141,7 @@ function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
     .html(function(d) {
       return (`${yLabel} ${d[chosenYAxis]}<br>${xLabel} ${d[chosenXAxis]}`);
     });
-  console.log(toolTip);
+  //console.log(toolTip);
   circlesGroup.call(toolTip);
 
   circlesGroup.on("mouseover", function(data) {
@@ -170,8 +174,8 @@ d3.csv("data/data.csv").then(function(censusData, err) {
   regression=leastSquaresequation(XaxisData,YaxisData)
 
   var line = d3.line()
-    .x(function(d) { console.log(d[chosenXAxis], xLinearScale(d[chosenXAxis])); return xLinearScale(d[chosenXAxis]); })
-    .y(function(d) { console.log(d[chosenYAxis], yLinearScale(d[chosenXAxis])); return yLinearScale(regression(d[chosenXAxis])); });
+    .x(function(d) { return xLinearScale(d[chosenXAxis]); })
+    .y(function(d) { return yLinearScale(regression(d[chosenXAxis])); });
 
   // xLinearScale function above csv import
   var xLinearScale = xScale(censusData, chosenXAxis);
@@ -192,7 +196,7 @@ d3.csv("data/data.csv").then(function(censusData, err) {
   // append y axis
   var yAxis = chartGroup.append("g")
     .classed("y-axis", true)
-    .attr("transform", `translate(${height}, left)`)
+    .attr("transform", `translate(${left+70}, 0)`)
     .call(leftAxis);
 
   // append initial circles
@@ -206,12 +210,12 @@ d3.csv("data/data.csv").then(function(censusData, err) {
     .attr("fill", "cadetblue")
     .attr("opacity", ".8");
 
-  // append fitting line
+
   var lineGroup = chartGroup.append("path")
-      //.append("path")
-      .datum(censusData)
-      .attr("class", "line")
-      .attr("d", line);
+          //.selectAll("path")
+          .datum(censusData)
+          .attr("class", "line")
+          .attr("d", line);
 
   // Create group for three x-axis labels
   var XlabelsGroup = chartGroup.append("g")
@@ -296,7 +300,7 @@ d3.csv("data/data.csv").then(function(censusData, err) {
         circlesGroup = renderCircles(circlesGroup, xLinearScale, yLinearScale, chosenXAxis, chosenYAxis);
 
         // updates fitting line with new x values
-        // lineGroup = renderLine(censusData, xLinearScale, yLinearScale, chosenXAxis, chosenYAxis);
+        lineGroup = renderLine(lineGroup, censusData, xLinearScale, yLinearScale, chosenXAxis, chosenYAxis);
 
         // updates tooltips with new info
         circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
@@ -361,7 +365,7 @@ d3.csv("data/data.csv").then(function(censusData, err) {
           circlesGroup = renderCircles(circlesGroup, xLinearScale, yLinearScale, chosenXAxis, chosenYAxis);
 
           // updates fitting line with new y values
-          // lineGroup = renderLine(censusData, xLinearScale, yLinearScale, chosenXAxis, chosenYAxis);
+          lineGroup = renderLine(lineGroup, censusData, xLinearScale, yLinearScale, chosenXAxis, chosenYAxis);
 
           // updates tooltips with new info
           circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
