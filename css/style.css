@@ -22,6 +22,21 @@ svg {
   opacity: 1.2;
 }
 
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.dot {
+  stroke: #000;
+}
+.line{
+stroke:dimgrey;
+stroke-width:2px;
+}
+
 .tooltip {
   position: absolute;
   width: 135px;
@@ -31,7 +46,7 @@ svg {
   font: 12px sans-serif;
   color: white;
   text-align: center;
-  background: #551aaf;
+  background: darkred;
   border: 0;
   border-radius: 10px;
 }
@@ -46,19 +61,19 @@ svg {
 .active {
   font-weight: bold;
   fill: #000;
-  fill: #551aaf;
+  fill: #483D8B;
   transition: fill 0.3s ease-out;
   text-anchor: middle;
 }
 
 .inactive {
   font-weight: lighter;
-  fill: #551aaf;
+  fill: #4682B4;
   transition: fill 0.3s ease-out;
   text-anchor: middle;
 }
 
 .inactive:hover {
-  fill: #e75480;
+  fill: darkred;
   cursor: pointer;
 }
