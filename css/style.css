@@ -132,6 +132,13 @@ stroke-width:2px;
   #table-area td {
     font-size: 1em;
   }
+  .row h2 {
+    font-size: 25px;
+  }
+  .menu::before {
+    width: 300px;
+    height: 380px;
+  }
 }
 
 @media (max-width: 500px) {
@@ -174,3 +181,11 @@ stroke-width:2px;
     text-align: center;
     content: attr(data-th);
   }
+  .row h2 {
+    font-size: 20px;
+  }
+  .menu::before {
+    width: 200px;
+    height: 300px;
+  }
+}

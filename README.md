@@ -15,6 +15,10 @@ The data set is based on 2014 ACS 1-year estimates: [https://factfinder.census.g
 
 ![dashboard_slide](Images/dashboard.png)
 
+## Census Data Site
+
+![dashboard_slide](Images/census.gif)
+
 ## Dataset Exploring
 
 ```JavaScript

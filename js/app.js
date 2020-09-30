@@ -85,7 +85,8 @@ function renderCircles(circlesGroup, newXScale, newYScale, chosenXAxis, chosenYA
   return circlesGroup;
 }
 
-function renderLine (lineGroup, censusData, xLinearScale, yLinearScale, chosenXAxis, chosenYAxis) {
+function renderLine (lineGroup, censusData, xLinearScale, yLinearScale,
+  chosenXAxis, chosenYAxis, StatesData, formulaGroup) {
   // regression data
   var newXaxisData = censusData.map(function(d) { return d[chosenXAxis]; });
   var newYaxisData = censusData.map(function(d) { return d[chosenYAxis]; });
@@ -100,10 +101,28 @@ function renderLine (lineGroup, censusData, xLinearScale, yLinearScale, chosenXA
     .duration(1000)
     .attr("d", newline);
 
+  // update regression equation
+  var formula = formula_equation(newXaxisData, newYaxisData);
+
+  formulaGroup
+    .transition()
+    .duration(1000)
+    .text(formula);
+
   // Update table data
-  // buildTable(StatesData, XaxisData, YaxisData, chosenXAxis, chosenYAxis);
+  buildTable(StatesData, newXaxisData, newYaxisData, chosenXAxis, chosenYAxis);
 
   return lineGroup;
+
+}
+
+function formula_equation (XaxisData, YaxisData) {
+  let regr_coeff = regr_equation(XaxisData, YaxisData);
+  let slope_value = regr_coeff[0].toFixed(4).toString();
+  let intercept_value = regr_coeff[1].toFixed(4).toString();
+  var formula = 'y =  ' + slope_value + 'x + ' + intercept_value;
+
+return formula;
 
 }
 
@@ -218,11 +237,8 @@ d3.csv("data/data.csv").then(function(censusData, err) {
     .attr("d", line);
 
   // append initial equation
-  let regr_coeff = regr_equation(XaxisData, YaxisData);
-  let slope_value = regr_coeff[0].toFixed(4).toString();
-  let intercept_value = regr_coeff[1].toFixed(4).toString();
-  var formula = 'y =  ' + slope_value + 'x + ' + intercept_value;
-  chartGroup.append("text")
+  var formula = formula_equation(XaxisData, YaxisData);
+  var formulaGroup = chartGroup.append("text")
       .attr("y", 0 - margin.left + 370)
       .attr("x", 0 + height - 70)
       .attr("dy", ".71em")
@@ -311,7 +327,8 @@ d3.csv("data/data.csv").then(function(censusData, err) {
         circlesGroup = renderCircles(circlesGroup, xLinearScale, yLinearScale, chosenXAxis, chosenYAxis);
 
         // updates fitting line with new x values
-        lineGroup = renderLine(lineGroup, censusData, xLinearScale, yLinearScale, chosenXAxis, chosenYAxis);
+        lineGroup = renderLine(lineGroup, censusData, xLinearScale, yLinearScale,
+          chosenXAxis, chosenYAxis, StatesData, formulaGroup);
 
         // updates tooltips with new info
         circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
@@ -374,7 +391,8 @@ d3.csv("data/data.csv").then(function(censusData, err) {
           circlesGroup = renderCircles(circlesGroup, xLinearScale, yLinearScale, chosenXAxis, chosenYAxis);
 
           // updates fitting line with new y values
-          lineGroup = renderLine(lineGroup, censusData, xLinearScale, yLinearScale, chosenXAxis, chosenYAxis);
+          lineGroup = renderLine(lineGroup, censusData, xLinearScale, yLinearScale,
+                    chosenXAxis, chosenYAxis, StatesData, formulaGroup);
 
           // updates tooltips with new info
           circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);

@@ -69,5 +69,4 @@ function buildTable(states, x_data, y_data, chosenXAxis, chosenYAxis) {
     trow.append("td").text(key);
   }
 
-  console.log(top_array_x, top_array_y);
 };
