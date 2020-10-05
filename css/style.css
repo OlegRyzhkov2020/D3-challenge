@@ -6,8 +6,8 @@
 html,
 body {
   height: 100%;
-  padding: 10px;
-  margin: 10px;
+  padding: 5px;
+  margin: 5px;
 }
 
 svg {
@@ -135,7 +135,7 @@ stroke-width:2px;
   .row h2 {
     font-size: 25px;
   }
-  .menu::before {
+  .menu {
     width: 300px;
     height: 380px;
   }
@@ -184,7 +184,7 @@ stroke-width:2px;
   .row h2 {
     font-size: 20px;
   }
-  .menu::before {
+  .menu {
     width: 200px;
     height: 300px;
   }
